@@ -17,7 +17,6 @@ export default function Navbar({ setColorValue }: Props) {
   }
 
   const handleChange = (e: any) => {
-    e.preventDefault()
     setSearchValue(e.target.value)
   }
 
