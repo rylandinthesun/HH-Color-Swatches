@@ -38,7 +38,7 @@ export default function Navbar({ setColorValue }: Props) {
           setSearchValue("")
         })
     }
-    setColorValue("")
+    setSearchValue("")
   }
 
   return (
