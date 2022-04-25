@@ -1,5 +1,5 @@
 import Image from "next/image"
-import React, { Dispatch, SetStateAction, useState } from "react"
+import React, { Dispatch, SetStateAction, useState, useEffect } from "react"
 import { useRouter } from "next/router"
 
 type Props = {
@@ -16,15 +16,14 @@ export default function Navbar({ setColorValue }: Props) {
     router.push("/", undefined, { shallow: true })
   }
 
-  const handleChange = (e: any) => {
-    setSearchValue(e.target.value)
-  }
-
   const handleSubmit = async (e: any) => {
     e.preventDefault()
     setIsSubmitted(true)
-    if (searchValue.length >= 3 && isSubmitted) {
-      await fetch(`https://api.color.pizza/v1/${searchValue}`)
+  }
+
+  useEffect(() => {
+    if (isSubmitted && searchValue) {
+      fetch(`https://api.color.pizza/v1/${searchValue}`)
         .then((response) => response.json())
         .then((data) => {
           router.push(`/?color=${data.colors[0].hex.substring(1)}`, undefined, {
@@ -34,11 +33,11 @@ export default function Navbar({ setColorValue }: Props) {
         .catch((e) => {
           console.log(e)
           router.push("/", undefined, { shallow: true })
-          setSearchValue("")
         })
+      setSearchValue("")
+      setIsSubmitted(false)
     }
-    setSearchValue("")
-  }
+  }, [isSubmitted, searchValue, router])
 
   return (
     <nav className="w-full bg-black/80 h-[10vh]">
@@ -61,7 +60,7 @@ export default function Navbar({ setColorValue }: Props) {
             minLength={3}
             maxLength={6}
             value={searchValue}
-            onChange={handleChange}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
         </form>
       </div>
