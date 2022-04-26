@@ -25,6 +25,7 @@ type ColorObject = {
 const Home: NextPage = () => {
   const [initialColors, setInitalColors] = useState<ColorObject[]>([])
   const [colorValue, setColorValue] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(false)
 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const colorsPerPage = 12
@@ -58,17 +59,23 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (colorValue) {
+      setLoading(true)
       fetch(`https://api.color.pizza/v1/names/${colorValue}?goodnamesonly=true`)
         .then((response) => response.json())
         .then((data) => {
           setInitalColors(data.colors.slice(0, 100))
+          setLoading(false)
         })
+        .catch((e) => console.log(e))
     } else {
+      setLoading(true)
       fetch("https://api.color.pizza/v1/")
         .then((response) => response.json())
         .then((data) => {
           setInitalColors(shuffle(data.colors).slice(0, 100))
+          setLoading(false)
         })
+        .catch((e) => console.log(e))
     }
   }, [colorValue])
 
@@ -95,9 +102,17 @@ const Home: NextPage = () => {
           ) : (
             <div className="h-[85vh] flex flex-col">
               <section className="p-8 grid grid-rows-4 md:grid-rows-3 grid-flow-col gap-10 h-full place-items-center">
-                {currentColors.map((color) => (
-                  <ColorCard key={color.hex} hex={color.hex} />
-                ))}
+                {loading ? (
+                  <div className="animate-pulse">
+                    <div className="text-4xl">Loading...</div>
+                  </div>
+                ) : (
+                  <>
+                    {currentColors.map((color) => (
+                      <ColorCard key={color.hex} hex={color.hex} />
+                    ))}
+                  </>
+                )}
               </section>
               <div className="flex w-full justify-center">
                 {pageNumbers.map((number) => (
